@@ -16,6 +16,94 @@ dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
+// Add product
+app.post('/products', [verifyToken, verifyRole('admin')], async (req, res) => {
+  const { id, name, price, stock } = req.body;
+
+  if (!id || !name || !price || !stock) {
+    return res.status(400).send({ message: 'Please provide id, name, price, and stock for the product.' });
+  }
+
+  try {
+    const productRef = db.collection('products').doc(id);
+    const productDoc = await productRef.get();
+
+    if (productDoc.exists) {
+      return res.status(400).send({ message: 'Product already exists.' });
+    }
+
+    await productRef.set({
+      id,
+      name,
+      price,
+      stock
+    });
+
+    res.status(201).send({ message: 'Product added successfully' });
+  } catch (error) {
+    res.status(500).send({ message: 'Error adding product, please try again later.' });
+  }
+});
+
+// Add order
+app.post('/orders', [verifyToken, verifyRole('admin')], async (req, res) => {
+  const { orderId, username, productId, quantity, totalPrice } = req.body;
+
+  if (!orderId || !username || !productId || !quantity || !totalPrice) {
+    return res.status(400).send({ message: 'Please provide orderId, username, productId, quantity, and totalPrice.' });
+  }
+
+  try {
+    const orderRef = db.collection('orders').doc(orderId);
+    const orderDoc = await orderRef.get();
+
+    if (orderDoc.exists) {
+      return res.status(400).send({ message: 'Order already exists.' });
+    }
+
+    await orderRef.set({
+      orderId,
+      username,
+      productId,
+      quantity,
+      totalPrice
+    });
+
+    res.status(201).send({ message: 'Order added successfully' });
+  } catch (error) {
+    res.status(500).send({ message: 'Error adding order, please try again later.' });
+  }
+});
+
+// Add payment
+app.post('/payments', [verifyToken, verifyRole('admin')], async (req, res) => {
+  const { paymentId, orderId, amount, status } = req.body;
+
+  if (!paymentId || !orderId || !amount || !status) {
+    return res.status(400).send({ message: 'Please provide paymentId, orderId, amount, and status.' });
+  }
+
+  try {
+    const paymentRef = db.collection('payments').doc(paymentId);
+    const paymentDoc = await paymentRef.get();
+
+    if (paymentDoc.exists) {
+      return res.status(400).send({ message: 'Payment already exists.' });
+    }
+
+    await paymentRef.set({
+      paymentId,
+      orderId,
+      amount,
+      status
+    });
+
+    res.status(201).send({ message: 'Payment added successfully' });
+  } catch (error) {
+    res.status(500).send({ message: 'Error adding payment, please try again later.' });
+  }
+});
+
 // Register route
 app.post('/register', async (req, res) => {
   const { username, password, role } = req.body;
