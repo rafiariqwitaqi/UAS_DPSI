@@ -155,7 +155,7 @@ app.post('/login', async (req, res) => {
       return res.status(401).send({ message: 'Invalid password.' });
     }
 
-    const token = jwt.sign({ id: user.username, role: user.role }, 'your_secret_key', { expiresIn: 86400 });
+    const token = jwt.sign({ id: user.username, role: user.role }, 'rafirafi', { expiresIn: 86400 });
 
     res.status(200).send({ token });
   } catch (error) {
